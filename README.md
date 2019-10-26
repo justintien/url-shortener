@@ -8,6 +8,16 @@ Just practicing the implementation of various languages.
 - java
 - nodejs
 
+## Usage
+
+- up server
+
+  ```sh
+  ./build.java.sh # build java first
+  # up server
+  docker-compose up --build -d
+  ```
+
 ## Example
 
 Only the ports are different.
