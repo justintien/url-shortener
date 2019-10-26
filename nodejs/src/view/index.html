@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.11/lodash.min.js"></script>
+<body>
+
+要縮短的網址: <input id="url" type="text" />
+<button onclick="shorten()">shorten</button> <br/>
+<div id="result"></div>
+
+<script type="text/javascript">
+function shorten () {
+    const el = document.getElementById("url")
+    const result = document.getElementById("result")
+    const url = el.value
+
+    axios({
+        url: '/graphql',
+        method: 'post',
+        data: {
+            query: `
+            mutation {
+                shorten (url: "${url}") {
+                    url
+                    shortid
+                }
+            }
+            `
+        }
+    }).then(res => {
+        const shortened = _.get(res, 'data.data.shorten')
+        const message = _.get(res, 'data.errors[0].message')
+
+        if (!shortened) {
+            return result.innerHTML = `<font color="red">${message}</font>`
+        }
+        const redirectTo = `${window.location.href}${shortened.shortid}`
+        result.innerHTML = `縮短網址為: <a href="${redirectTo}" target="_blank">${redirectTo}</a>`
+    }).catch(e => {
+
+    });
+}
+</script>
+</body>
+</html>

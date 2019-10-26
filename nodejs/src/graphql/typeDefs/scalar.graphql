@@ -1,0 +1,18 @@
+scalar DateTime
+
+type shortened_urls {
+    id: ID
+    url: String
+    shortId: String
+    createdAt: DateTime
+    updatedAt: DateTime
+    deletedAt: DateTime
+}
+
+type Query {
+    findUrl (id: Int!): shortened_urls
+}
+
+type Mutation {
+    shorten (url: String!): shortened_urls
+}

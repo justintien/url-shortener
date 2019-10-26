@@ -1,0 +1,46 @@
+{
+  "name": "nodejs-url-shortener",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon ./src",
+    "lint": "node_modules/.bin/eslint config db src test",
+    "test:unit": "mocha --exit test/unit",
+    "test:db": "mocha --exit test/db",
+    "test:api": "mocha --exit test/api",
+    "test": "mocha --exit test/unit test/db test/api",
+    "db:migrate": "node_modules/.bin/sequelize db:migrate",
+    "docker:dev": "docker-compose up",
+    "docker:db": "docker-compose exec mysql mysql --default-character-set=utf8 test",
+    "docker:db:migrate": "docker-compose exec app npm run db:migrate",
+    "docker:db:migrate:force": "docker-compose exec app sh -c \"node_modules/.bin/sequelize db:migrate:undo:all && node_modules/.bin/sequelize db:migrate\""
+  },
+  "author": "Justin <thitbbeb@gmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "apollo-server-koa": "^2.4.8",
+    "config": "^3.1.0",
+    "graphql": "^14.3.0",
+    "graphql-tools": "^4.0.5",
+    "graphql-type-datetime": "^0.2.4",
+    "koa": "^2.7.0",
+    "koa-bodyparser": "^4.2.1",
+    "lodash": "^4.17.11",
+    "mysql2": "^1.6.5",
+    "sequelize": "^5.8.5"
+  },
+  "devDependencies": {
+    "eslint": "^5.16.0",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-plugin-import": "^2.17.2",
+    "eslint-plugin-node": "^9.0.1",
+    "eslint-plugin-promise": "^4.1.1",
+    "eslint-plugin-standard": "^4.0.0",
+    "sequelize-cli": "^5.4.0"
+  },
+  "optionalDependencies": {
+    "nodemon": "^1.19.0"
+  }
+}

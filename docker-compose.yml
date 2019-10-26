@@ -1,0 +1,60 @@
+version: "3"
+
+services:
+  go:
+    image: go-url-shortener
+    build: ./go/
+    restart: on-failure
+    ports:
+      - "${GO_EXPOSED_PORT}:${GO_EXPOSED_PORT}"
+    links:
+      - mysql
+    depends_on:
+      - mysql
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=test
+  java:
+    image: tomcat
+    restart: on-failure
+    volumes:
+      - ./java/target/shortener-0.0.1-SNAPSHOT:/usr/local/tomcat/webapps/ROOT
+    ports:
+      - "${JAVA_EXPOSED_PORT}:8080"
+    links:
+      - mysql
+    depends_on:
+      - mysql
+  nodejs:
+    image: node:10-alpine
+    volumes:
+      - ./nodejs:/app
+    ports:
+      - "${NODEJS_EXPOSED_PORT}:4000"
+    environment:
+      - "DEBUG=*"
+      - NODE_ENV=testing
+    links:
+      - mysql
+    depends_on:
+      - mysql
+    working_dir: /app
+    command:
+      - /bin/sh
+      - -c
+      - |
+        npm i
+        npm run dev -- -L
+
+  mysql:
+    image: mysql:5.7
+    restart: always
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d
+    env_file:
+      - .env
+    environment:
+      MYSQL_ROOT_PASSWORD: "${DB_PASSWORD}"
+      TIMEZONE: "${DB_TIMEZONE}"
+      MYSQL_DATABASE: "${DATABASE_NAME}"
