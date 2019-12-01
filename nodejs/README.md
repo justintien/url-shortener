@@ -18,15 +18,20 @@
   docker-compose exec app npm run db:migrate
   ```
 
-## Example
+## Api
 
-> test server alive
+### test server alive
 
-```curl
+```sh
 curl -X GET http://localhost:4000
+# response: server alive!
 ```
 
-> generate short url
+### 縮網址(graphql)
+
+```http
+POST /graphql
+```
 
 ```sh
 ## graphql api
@@ -35,15 +40,95 @@ curl -X POST \
   -H 'Content-Type: application/json' \
   -d '{"query": "mutation { shorten (url: \"https://baidu.com\") { id url shortId createdAt updatedAt deletedAt } }"
 }'
-
-# restful api
-curl -X POST -H "Content-Type:application/json" -d "{\"url\": \"http://www.google.com\"}" http://localhost:4000/shorten
-# Response:
-# {"id":1,"url":"http://www.google.com","shortId":"K234GEDO8716","createdAt":"2019-10-23T10:15:28.000+0000","updatedAt":"2019-12-31T10:15:28.000+0000","deletedAt":null}
 ```
 
-> Redirect short url to origin url
+### 縮網址
+
+```http
+POST /shorten
+```
+
+#### 参数
+
+Attribute | Type | Required | Description
+--- | --- | --- | ---
+`url` | url | yes | 要縮短的原網址
+
+> example:
+
+```sh
+curl -X POST \
+-H "Content-Type:application/json" \
+-d "{\"url\": \"http://www.google.com\"}" \
+http://localhost:4000/shorten
+```
+
+##### response
+
+```http
+200 OK
+```
+
+```json
+{
+    "id": 1,
+    "url": "http://www.google.com",
+    "shortId": "k3mau1pvbILo",
+    "createdAt": "2019-10-23T10:15:28.000+0000",
+    "updatedAt": "2019-12-31T10:15:28.000+0000",
+    "deletedAt": null
+}
+```
+
+or
+
+```http
+400 Bad Request
+```
+
+```json
+{
+    "error": "Invalid url"
+}
+```
+
+### redirect 縮網址
+
+```http
+GET /{shortId}
+```
+
+#### 参数
+
+Attribute | Type | Required | Description
+--- | --- | --- | ---
+`{shortId}` | String | yes | 縮網址ID
+
+> example:
+
+```sh
+curl -X GET \
+http://localhost:4000/k3mau1pvbILo
+```
+
+##### response
+
+```http
+303 See Other
+```
 
 ```text
-browser: http://localhost:4000/K234GEDO8716
+redirect to: http://www.google.com
+```
+
+or
+
+```http
+404 Not Found
+```
+
+```json
+{
+    "error": "Not Found"
+}
 ```

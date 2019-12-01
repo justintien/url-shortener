@@ -2,18 +2,19 @@ package shortener
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
-	"os"
 
 	// Add mysql driver
 	_ "github.com/go-sql-driver/mysql"
 )
 
 //InitDB inits mysql database
-func InitDB(datasource string) *sql.DB {
-	var db *sql.DB
-	var err error
-	db, err = sql.Open(datasource, os.Getenv("DB_USER")+":"+os.Getenv("DB_PASSWORD")+"@tcp(mysql:"+os.Getenv("DB_PORT")+")/"+os.Getenv("DATABASE_NAME"))
+func InitDB(datasource, dbUser, dbPass, dbName, port string) *sql.DB {
+	connectionString :=
+		fmt.Sprintf("%s:%s@tcp(mysql:%s)/%s", dbUser, dbPass, dbName, port)
+
+	db, err := sql.Open(datasource, connectionString)
 
 	if err != nil {
 		log.Panic(err)

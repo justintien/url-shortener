@@ -15,6 +15,13 @@ func serve(a shortener.App) {
 
 func main() {
 	a := shortener.App{}
-	a.DB = shortener.InitDB("mysql")
+	a.DB = shortener.InitDB(
+		"mysql",
+		os.Getenv("DB_USER"),
+		os.Getenv("DB_PASSWORD"),
+		os.Getenv("DB_PORT"),
+		os.Getenv("DATABASE_NAME"),
+	)
+
 	serve(a)
 }

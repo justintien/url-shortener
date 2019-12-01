@@ -1,8 +1,8 @@
 package shortener
 
 import (
-	"strconv"
-	"strings"
+	"math/rand"
+	"net/url"
 	"time"
 )
 
@@ -33,20 +33,40 @@ import (
 
 func shortId() string {
 	timestamp := int(time.Now().UnixNano() / int64(time.Millisecond))
-	timeString := strconv.Itoa(timestamp)
-	str := numberToBHex(timestamp, 36)
+	// timeString := strconv.Itoa(timestamp)
+	str := NumberToBHex(timestamp, 36)
 
-	str = str + string([]rune(timeString)[len(timeString)-4:len(timeString)])
+	str = str + RandomString(4)
 	return str
 }
 
-func numberToBHex(num, n int) string {
-	num2char := "0123456789abcdefghijklmnopqrstuvwxyz"
+// 10 進制轉換 n = ?進制
+func NumberToBHex(num, n int) string {
+	var num2char = "0123456789abcdefghijklmnopqrstuvwxyz"
 	num_str := ""
 	for num != 0 {
 		yu := num % n
 		num_str = string(num2char[yu]) + num_str
 		num = num / n
 	}
-	return strings.ToUpper(num_str)
+	return num_str
+}
+
+func RandomString(n int) string {
+	rand.Seed(time.Now().UnixNano())
+	var letter = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letter[rand.Intn(len(letter))]
+	}
+	return string(b)
+}
+
+func isValidURL(toTest string) bool {
+	_, err := url.ParseRequestURI(toTest)
+	if err != nil {
+		return false
+	}
+	return true
 }
