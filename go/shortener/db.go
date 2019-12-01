@@ -1,26 +1,24 @@
 package shortener
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 
-	// Add mysql driver
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/jinzhu/gorm"
 )
 
-//InitDB inits mysql database
-func InitDB(datasource, dbUser, dbPass, dbName, port string) *sql.DB {
+func InitDB(datasource, dbUser, dbPass, dbName, port string) *gorm.DB {
 	connectionString :=
-		fmt.Sprintf("%s:%s@tcp(mysql:%s)/%s", dbUser, dbPass, dbName, port)
+		fmt.Sprintf("%s:%s@tcp(mysql:%s)/%s?parseTime=true", dbUser, dbPass, dbName, port)
 
-	db, err := sql.Open(datasource, connectionString)
+	db, err := gorm.Open(datasource, connectionString)
 
 	if err != nil {
 		log.Panic(err)
 	}
 
-	if err = db.Ping(); err != nil {
+	if err = db.DB().Ping(); err != nil {
 		log.Panic(err)
 	}
 	return db

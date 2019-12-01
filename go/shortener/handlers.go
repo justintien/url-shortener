@@ -1,11 +1,11 @@
 package shortener
 
 import (
-	"database/sql"
 	"encoding/json"
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/jinzhu/gorm"
 )
 
 func (a *App) Home(w http.ResponseWriter, r *http.Request) {
@@ -21,7 +21,7 @@ func (a *App) Shorten(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer r.Body.Close()
-	url := body.URL
+	url := body.Url
 
 	if !isValidURL(url) {
 		respondWithError(w, http.StatusBadRequest, "Invalid url")
@@ -29,18 +29,17 @@ func (a *App) Shorten(w http.ResponseWriter, r *http.Request) {
 	}
 
 	model := Url{
-		URL:      url,
-		SHORT_ID: shortId(),
+		Url:     url,
+		Shortid: shortId(),
 	}
 	if err := model.findByUrl(a.DB); err != nil {
 		switch err {
-		case sql.ErrNoRows:
-			res, err := model.create(a.DB)
+		case gorm.ErrRecordNotFound:
+			err := model.create(a.DB)
 			if err != nil {
 				respondWithError(w, http.StatusInternalServerError, err.Error())
 				return
 			}
-			model.ID, _ = res.LastInsertId()
 		default:
 			respondWithError(w, http.StatusInternalServerError, err.Error())
 			return
@@ -56,7 +55,7 @@ func (a *App) Shorten(w http.ResponseWriter, r *http.Request) {
 func (a *App) Redirect(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	model := Url{
-		SHORT_ID: vars["shortId"],
+		Shortid: vars["shortId"],
 	}
 
 	if err := model.findByShortid(a.DB); err != nil {
@@ -64,7 +63,7 @@ func (a *App) Redirect(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, model.URL, http.StatusSeeOther)
+	http.Redirect(w, r, model.Url, http.StatusSeeOther)
 }
 
 func respondWithError(w http.ResponseWriter, code int, message string) {

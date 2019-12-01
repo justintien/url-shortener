@@ -1,16 +1,16 @@
 package shortener
 
 import (
-	"database/sql"
 	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/jinzhu/gorm"
 )
 
 type App struct {
 	Router *mux.Router
-	DB     *sql.DB
+	DB     *gorm.DB
 }
 
 func (a *App) Init() {
